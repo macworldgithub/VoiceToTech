@@ -125,6 +125,7 @@
 // }
 
 import { Suspense } from "react";
+//@ts-ignore
 import Form from "./Form";
 
 export default function Page() {

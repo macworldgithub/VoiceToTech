@@ -28,14 +28,24 @@ function App() {
 
   const startRecording = async () => {
     try {
-      // clear old recording
       if (audioURL) {
         URL.revokeObjectURL(audioURL);
         setAudioURL(null);
       }
 
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const mediaRecorder = new MediaRecorder(stream);
+
+      // Choose supported mimeType
+      let options: MediaRecorderOptions = {};
+      if (MediaRecorder.isTypeSupported("audio/webm")) {
+        options = { mimeType: "audio/webm" };
+      } else if (MediaRecorder.isTypeSupported("audio/mp4")) {
+        options = { mimeType: "audio/mp4" };
+      } else if (MediaRecorder.isTypeSupported("audio/mpeg")) {
+        options = { mimeType: "audio/mpeg" };
+      }
+
+      const mediaRecorder = new MediaRecorder(stream, options);
       mediaRecorderRef.current = mediaRecorder;
       chunks.current = [];
 
@@ -47,7 +57,7 @@ function App() {
       };
 
       mediaRecorder.onstop = () => {
-        const blob = new Blob(chunks.current, { type: "audio/webm" });
+        const blob = new Blob(chunks.current, { type: mediaRecorder.mimeType });
         const url = URL.createObjectURL(blob);
         setAudioURL(url);
         setShowSubmit(true);
@@ -97,10 +107,13 @@ function App() {
 
     setLoader(true);
 
-    const response = await fetch("https://www.apivtt.omnisuiteai.com/transcribe", {
-      method: "POST",
-      body: formData,
-    });
+    const response = await fetch(
+      "https://www.apivtt.omnisuiteai.com/transcribe",
+      {
+        method: "POST",
+        body: formData,
+      }
+    );
 
     const result = await response.json();
 
@@ -195,7 +208,7 @@ function App() {
           {audioURL && !isRecording && (
             <div className="mt-8 w-full max-w-md text-center">
               <p className="text-white/70 mb-2">Preview your recording:</p>
-              <audio controls src={audioURL} className="w-full" />
+              <audio controls playsInline src={audioURL}></audio>
             </div>
           )}
 
