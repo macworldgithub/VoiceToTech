@@ -1,103 +1,216 @@
-import Image from "next/image";
+"use client";
 
-export default function Home() {
+import React, { useState, useRef, useEffect } from "react";
+import { Mic, Square } from "lucide-react";
+import Soundwave from "../../components/Soundwave";
+import { useRouter } from "next/navigation";
+import Loader from "../../components/Loader";
+
+function App() {
+  const [isRecording, setIsRecording] = useState(false);
+  const [recordingTime, setRecordingTime] = useState(0);
+  const [showSubmit, setShowSubmit] = useState(false);
+  const [audioURL, setAudioURL] = useState<string | null>(null);
+
+  const [loader, setLoader] = useState<boolean>(false);
+
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const chunks = useRef<Blob[]>([]);
+  const timerRef = useRef<number | null>(null);
+  const router = useRouter();
+
+  useEffect(() => {
+    return () => {
+      if (timerRef.current) clearInterval(timerRef.current);
+      if (audioURL) URL.revokeObjectURL(audioURL);
+    };
+  }, [audioURL]);
+
+  const startRecording = async () => {
+    try {
+      // clear old recording
+      if (audioURL) {
+        URL.revokeObjectURL(audioURL);
+        setAudioURL(null);
+      }
+
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const mediaRecorder = new MediaRecorder(stream);
+      mediaRecorderRef.current = mediaRecorder;
+      chunks.current = [];
+
+      setShowSubmit(false);
+      setRecordingTime(0);
+
+      mediaRecorder.ondataavailable = (e) => {
+        if (e.data.size > 0) chunks.current.push(e.data);
+      };
+
+      mediaRecorder.onstop = () => {
+        const blob = new Blob(chunks.current, { type: "audio/webm" });
+        const url = URL.createObjectURL(blob);
+        setAudioURL(url);
+        setShowSubmit(true);
+      };
+
+      mediaRecorder.start();
+      setIsRecording(true);
+
+      timerRef.current = window.setInterval(() => {
+        setRecordingTime((prev) => prev + 1);
+      }, 1000);
+    } catch (error) {
+      console.error("Error accessing microphone:", error);
+    }
+  };
+
+  const stopRecording = () => {
+    if (mediaRecorderRef.current && isRecording) {
+      mediaRecorderRef.current.stop();
+      mediaRecorderRef.current.stream
+        .getTracks()
+        .forEach((track) => track.stop());
+      setIsRecording(false);
+
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+        timerRef.current = null;
+      }
+    }
+  };
+
+  const toggleRecording = () => {
+    if (isRecording) {
+      stopRecording();
+    } else {
+      startRecording();
+    }
+  };
+
+  const submitRecording = async () => {
+    if (!chunks.current.length) return;
+
+    const blob = new Blob(chunks.current, { type: "audio/webm" });
+    const file = new File([blob], "speech.webm", { type: "audio/webm" });
+    const formData = new FormData();
+    formData.append("audio", file);
+
+    setLoader(true);
+
+    const response = await fetch("http://localhost:4000/transcribe", {
+      method: "POST",
+      body: formData,
+    });
+
+    const result = await response.json();
+
+    setShowSubmit(false);
+    setRecordingTime(0);
+    setAudioURL(null);
+
+    setLoader(false);
+    router.push(
+      `/vehicleinfo?workNumber=${encodeURIComponent(
+        result["Work Number"]
+      )}&vehicleInfo=${encodeURIComponent(
+        result["Vehicle Information"]
+      )}&problem=${encodeURIComponent(result["Problem Description"])}`
+    );
+  };
+
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins.toString().padStart(2, "0")}:${secs
+      .toString()
+      .padStart(2, "0")}`;
+  };
+
   return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
-
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+    <div className="min-h-screen bg-gradient-to-br from-pink-600 via-purple-900 to-slate-900 flex items-center justify-center p-6">
+      <div className="w-full max-w-4xl">
+        <div className="text-center mb-12">
+          <h1 className="text-5xl font-bold text-white mb-4">Voice to Tech</h1>
+          <p className="text-xl text-white/80">
+            Workshop Repair Order Assistant
+          </p>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+
+        <div className="space-y-4 mb-16">
+          <div className="bg-white/10 backdrop-blur-sm rounded-full px-6 py-4 text-white/70">
+            What is your work number?
+          </div>
+          <div className="bg-white/10 backdrop-blur-sm rounded-full px-6 py-4 text-white/70">
+            What is your Vehicle Information?
+          </div>
+          <div className="bg-white/10 backdrop-blur-sm rounded-full px-6 py-4 text-white/70">
+            What is your problem?
+          </div>
+        </div>
+
+        {loader && <Loader />}
+
+        <div className="flex flex-col items-center">
+          <div className="relative w-full h-32 mb-8">
+            <Soundwave isActive={isRecording} />
+          </div>
+
+          {isRecording && (
+            <div className="text-3xl font-mono text-pink-400 mb-6">
+              {formatTime(recordingTime)}
+            </div>
+          )}
+
+          <button
+            onClick={toggleRecording}
+            className={`relative group transition-all duration-300 ${
+              isRecording ? "scale-110" : "hover:scale-105"
+            }`}
+          >
+            <div
+              className={`absolute inset-0 rounded-full blur-2xl transition-all duration-300 ${
+                isRecording
+                  ? "bg-red-500/50 animate-pulse"
+                  : "bg-pink-500/30 group-hover:bg-pink-500/40"
+              }`}
+            />
+            <div
+              className={`relative rounded-full p-8 transition-all duration-300 ${
+                isRecording
+                  ? "bg-gradient-to-br from-red-500 to-red-600"
+                  : "bg-gradient-to-br from-pink-500/20 to-purple-500/20 group-hover:from-pink-500/30 group-hover:to-purple-500/30"
+              } backdrop-blur-sm border-2 ${
+                isRecording ? "border-red-400" : "border-white/20"
+              }`}
+            >
+              {isRecording ? (
+                <Square className="w-12 h-12 text-white fill-white" />
+              ) : (
+                <Mic className="w-12 h-12 text-white" />
+              )}
+            </div>
+          </button>
+
+          {/* Preview shows only after stop */}
+          {audioURL && !isRecording && (
+            <div className="mt-8 w-full max-w-md text-center">
+              <p className="text-white/70 mb-2">Preview your recording:</p>
+              <audio controls src={audioURL} className="w-full" />
+            </div>
+          )}
+
+          {showSubmit && !isRecording && (
+            <button
+              onClick={submitRecording}
+              className="mt-8 px-12 py-4 bg-gradient-to-r from-pink-500 to-purple-600 text-white text-xl font-semibold rounded-full hover:from-pink-600 hover:to-purple-700 transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105"
+            >
+              Submit
+            </button>
+          )}
+        </div>
+      </div>
     </div>
   );
 }
+
+export default App;
