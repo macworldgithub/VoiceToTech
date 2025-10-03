@@ -26,6 +26,12 @@ function App() {
     };
   }, [audioURL]);
 
+  const recordingMeta = useRef<{
+    blob: Blob;
+    mimeType: string;
+    extension: string;
+  } | null>(null);
+
   const startRecording = async () => {
     try {
       if (audioURL) {
@@ -35,17 +41,25 @@ function App() {
 
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
 
-      // Choose supported mimeType
-      let options: MediaRecorderOptions = {};
+      // Pick supported MIME type + extension
+      let mimeType = "audio/webm";
+      let extension = "webm";
+
       if (MediaRecorder.isTypeSupported("audio/webm")) {
-        options = { mimeType: "audio/webm" };
+        mimeType = "audio/webm"; // Chrome/Android/Desktop
+        extension = "webm";
       } else if (MediaRecorder.isTypeSupported("audio/mp4")) {
-        options = { mimeType: "audio/mp4" };
+        mimeType = "audio/mp4"; // iOS Safari
+        extension = "mp4";
       } else if (MediaRecorder.isTypeSupported("audio/mpeg")) {
-        options = { mimeType: "audio/mpeg" };
+        mimeType = "audio/mpeg"; // fallback for some browsers
+        extension = "mp3";
+      } else if (MediaRecorder.isTypeSupported("audio/mp4;codecs=aac")) {
+        mimeType = "audio/mp4;codecs=aac";
+        extension = "mp4";
       }
 
-      const mediaRecorder = new MediaRecorder(stream, options);
+      const mediaRecorder = new MediaRecorder(stream, { mimeType });
       mediaRecorderRef.current = mediaRecorder;
       chunks.current = [];
 
@@ -57,9 +71,13 @@ function App() {
       };
 
       mediaRecorder.onstop = () => {
-        const blob = new Blob(chunks.current, { type: mediaRecorder.mimeType });
+        const blob = new Blob(chunks.current, { type: mimeType });
         const url = URL.createObjectURL(blob);
         setAudioURL(url);
+
+        // Save extension + mimeType so submitRecording knows how to send file
+        recordingMeta.current = { blob, mimeType, extension };
+
         setShowSubmit(true);
       };
 
@@ -98,37 +116,49 @@ function App() {
   };
 
   const submitRecording = async () => {
-    if (!chunks.current.length) return;
+    if (!recordingMeta.current) return;
 
-    const blob = new Blob(chunks.current, { type: "audio/webm" });
-    const file = new File([blob], "speech.webm", { type: "audio/webm" });
+    const { blob, mimeType, extension } = recordingMeta.current;
+
+    const file = new File([blob], `speech.${extension}`, { type: mimeType });
     const formData = new FormData();
     formData.append("audio", file);
 
     setLoader(true);
 
-    const response = await fetch(
-      "https://www.apivtt.omnisuiteai.com/transcribe",
-      {
-        method: "POST",
-        body: formData,
+    try {
+      const response = await fetch(
+        "https://www.apivtt.omnisuiteai.com/transcribe",
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`Server error: ${response.status}`);
       }
-    );
 
-    const result = await response.json();
+      const result = await response.json();
 
-    setShowSubmit(false);
-    setRecordingTime(0);
-    setAudioURL(null);
+      setShowSubmit(false);
+      setRecordingTime(0);
+      setAudioURL(null);
+      recordingMeta.current = null;
 
-    setLoader(false);
-    router.push(
-      `/vehicleinfo?workNumber=${encodeURIComponent(
-        result["Work Number"]
-      )}&vehicleInfo=${encodeURIComponent(
-        result["Vehicle Information"]
-      )}&problem=${encodeURIComponent(result["Problem Description"])}`
-    );
+      router.push(
+        `/vehicleinfo?workNumber=${encodeURIComponent(
+          result["Work Number"] || ""
+        )}&vehicleInfo=${encodeURIComponent(
+          result["Vehicle Information"] || ""
+        )}&problem=${encodeURIComponent(result["Problem Description"] || "")}`
+      );
+    } catch (err) {
+      console.error("Upload error:", err);
+      alert("Failed to submit recording. Please try again.");
+    } finally {
+      setLoader(false);
+    }
   };
 
   const formatTime = (seconds: number) => {
