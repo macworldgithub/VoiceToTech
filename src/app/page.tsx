@@ -128,7 +128,8 @@ function App() {
 
     try {
       const response = await fetch(
-        "https://www.apivtt.omnisuiteai.com/transcribe",
+        // "https://www.apivtt.omnisuiteai.com/transcribe",
+        "http://localhost:4000/transcribe",
         {
           method: "POST",
           body: formData,
