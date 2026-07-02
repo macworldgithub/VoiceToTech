@@ -122,7 +122,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Phone } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 
 interface RepairOrderForm2Props {
@@ -170,82 +170,106 @@ export default function Form({ onSubmit }: RepairOrderForm2Props) {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#0a1830] via-[#0f2547] to-[#050d1c] flex items-center justify-center p-6">
-      <div className="w-full max-w-2xl">
-        <div className="relative mb-10">
-          <button
-            onClick={() => router.replace("/")}
-            className="absolute left-0 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/[0.06] border border-white/10 backdrop-blur-sm flex items-center justify-center text-white hover:bg-white/10 transition-all"
-          >
-            <ArrowLeft className="w-6 h-6" />
-          </button>
-          <div className="text-center">
-            <div className="inline-flex items-center gap-2 mb-2">
-              <div className="h-1 w-8 bg-[#c8102e] rounded-full" />
-              <span className="text-xs font-semibold tracking-[0.25em] text-white/50 uppercase">
-                Patterson Cheney
-              </span>
-              <div className="h-1 w-8 bg-[#c8102e] rounded-full" />
+    <div className="min-h-screen bg-[#eef1f4] flex flex-col">
+      {/* Top bar — mirrors pattersoncheney.com.au header */}
+      <header className="bg-white border-b border-black/10">
+        <div className="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="relative w-11 h-11 rounded-full overflow-hidden border border-black/10 shrink-0">
+              <div className="absolute inset-0 bg-[#1a73c2]" style={{ clipPath: "polygon(0 0, 100% 0, 100% 55%, 0 55%)" }} />
+              <div className="absolute inset-0 bg-[#f2b90c]" style={{ clipPath: "polygon(0 55%, 100% 55%, 100% 100%, 0 100%)" }} />
             </div>
-            <h1 className="text-3xl font-semibold text-white">
+            <div className="leading-tight">
+              <div className="text-xl font-bold text-[#151515] tracking-tight">
+                Patterson Cheney
+              </div>
+              <div className="text-[11px] text-black/50 italic -mt-0.5">
+                Cars and Trucks since 1915
+              </div>
+            </div>
+          </div>
+          <div className="hidden sm:flex items-center gap-2 text-[#1a73c2] font-semibold">
+            <Phone className="w-4 h-4" />
+            <span>03 9590 5000</span>
+          </div>
+        </div>
+      </header>
+
+      <main className="flex-1 flex items-center justify-center p-6">
+        <div className="w-full max-w-2xl">
+          <div className="relative mb-8">
+            <button
+              onClick={() => router.replace("/")}
+              className="absolute left-0 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white border border-black/10 shadow-sm flex items-center justify-center text-[#151515] hover:bg-black/5 transition-all"
+            >
+              <ArrowLeft className="w-6 h-6" />
+            </button>
+            <h1 className="text-3xl font-bold text-[#151515] text-center">
               Repair Order
             </h1>
           </div>
+
+          <div className="bg-white rounded-2xl p-8 shadow-md border border-black/10">
+            <form onSubmit={handleSubmit} className="space-y-6">
+              <div>
+                <label className="block text-sm font-semibold text-[#151515] mb-2">
+                  Work Number*
+                </label>
+                <input
+                  type="text"
+                  value={workNumber}
+                  onChange={(e) => setWorkNumber(e.target.value)}
+                  placeholder="2024-1543"
+                  required
+                  className="w-full px-5 py-4 bg-[#f5f7f9] border border-black/15 rounded-lg text-[#151515] placeholder-black/30 focus:outline-none focus:ring-2 focus:ring-[#1a73c2] focus:border-transparent transition-all"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-[#151515] mb-2">
+                  Vehicle Information*
+                </label>
+                <input
+                  type="text"
+                  value={vehicleInfo}
+                  onChange={(e) => setVehicleInfo(e.target.value)}
+                  placeholder="2019 Honda Civic"
+                  required
+                  className="w-full px-5 py-4 bg-[#f5f7f9] border border-black/15 rounded-lg text-[#151515] placeholder-black/30 focus:outline-none focus:ring-2 focus:ring-[#1a73c2] focus:border-transparent transition-all"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-[#151515] mb-2">
+                  Problem Description*
+                </label>
+                <textarea
+                  value={problemDescription}
+                  onChange={(e) => setProblemDescription(e.target.value)}
+                  placeholder="Customer reports unusual grinding noise when braking and steering wheel vibration at high speeds"
+                  required
+                  rows={4}
+                  className="w-full px-5 py-4 bg-[#f5f7f9] border border-black/15 rounded-lg text-[#151515] placeholder-black/30 focus:outline-none focus:ring-2 focus:ring-[#1a73c2] focus:border-transparent transition-all resize-none"
+                />
+              </div>
+
+              <button
+                type="submit"
+                className="w-full py-4 bg-[#1a73c2] text-white font-bold uppercase tracking-wide rounded-md hover:bg-[#155a99] transition-all duration-300 shadow-md hover:shadow-lg"
+              >
+                Submit Repair Order
+              </button>
+            </form>
+          </div>
         </div>
+      </main>
 
-        <div className="bg-white/[0.04] backdrop-blur-sm rounded-3xl p-8 shadow-2xl border border-white/10">
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div>
-              <label className="block text-sm font-medium text-white/70 mb-2">
-                Work Number*
-              </label>
-              <input
-                type="text"
-                value={workNumber}
-                onChange={(e) => setWorkNumber(e.target.value)}
-                placeholder="2024-1543"
-                required
-                className="w-full px-5 py-4 bg-[#0d1f3a]/60 border border-white/10 rounded-2xl text-white placeholder-white/30 focus:outline-none focus:ring-2 focus:ring-[#c8102e] focus:border-transparent transition-all"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-white/70 mb-2">
-                Vehicle Information*
-              </label>
-              <input
-                type="text"
-                value={vehicleInfo}
-                onChange={(e) => setVehicleInfo(e.target.value)}
-                placeholder="2019 Honda Civic"
-                required
-                className="w-full px-5 py-4 bg-[#0d1f3a]/60 border border-white/10 rounded-2xl text-white placeholder-white/30 focus:outline-none focus:ring-2 focus:ring-[#c8102e] focus:border-transparent transition-all"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-white/70 mb-2">
-                Problem Description*
-              </label>
-              <textarea
-                value={problemDescription}
-                onChange={(e) => setProblemDescription(e.target.value)}
-                placeholder="Customer reports unusual grinding noise when braking and steering wheel vibration at high speeds"
-                required
-                rows={4}
-                className="w-full px-5 py-4 bg-[#0d1f3a]/60 border border-white/10 rounded-2xl text-white placeholder-white/30 focus:outline-none focus:ring-2 focus:ring-[#c8102e] focus:border-transparent transition-all resize-none"
-              />
-            </div>
-
-            <button
-              type="submit"
-              className="w-full py-4 bg-[#c8102e] text-white font-semibold rounded-full hover:bg-[#a80d26] transition-all duration-300 shadow-lg shadow-[#c8102e]/30 hover:shadow-xl hover:scale-[1.02] active:scale-[0.98]"
-            >
-              Submit Repair Order
-            </button>
-          </form>
+      {/* Bottom bar echoing the site's black footer */}
+      <footer className="bg-[#111111] py-5">
+        <div className="max-w-5xl mx-auto px-6 text-center text-white/40 text-xs">
+          Patterson Cheney Group — Internal Workshop Tool
         </div>
-      </div>
+      </footer>
     </div>
   );
 }
