@@ -125,6 +125,9 @@ import { useState, useEffect } from "react";
 import { ArrowLeft, ArrowRight, Phone } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 
+const PC_LOGO =
+  "https://nextgen-images.cdn.dealersolutions.com.au/modular.multisite.dealer.solutions/wp-content/uploads/sites/3044/2024/03/19140735/PC-Primary-logo2.png?format=webp&width=351";
+
 interface RepairOrderForm2Props {
   onSubmit?: (data: {
     workNumber: string;
@@ -170,65 +173,57 @@ export default function Form({ onSubmit }: RepairOrderForm2Props) {
   };
 
   return (
-    <div className="min-h-screen bg-[#F4F6F8] flex flex-col">
+    <div className="min-h-[100dvh] bg-[#F4F6F8] flex flex-col">
       {/* Sticky glass header — matches the capture screen */}
       <header className="sticky top-0 z-20 bg-white/80 backdrop-blur-md border-b border-black/[0.06]">
-        <div className="max-w-4xl mx-auto px-6 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="relative w-9 h-9 rounded-full overflow-hidden shrink-0 ring-1 ring-black/[0.06]">
-              <div className="absolute inset-0 bg-[#1a73c2]" style={{ clipPath: "polygon(0 0, 100% 0, 100% 55%, 0 55%)" }} />
-              <div className="absolute inset-0 bg-[#f2b90c]" style={{ clipPath: "polygon(0 55%, 100% 55%, 100% 100%, 0 100%)" }} />
-            </div>
-            <div className="leading-tight">
-              <div className="text-[15px] font-semibold text-[#0E1013] tracking-tight">
-                Patterson Cheney
-              </div>
-              <div className="text-[10px] font-mono uppercase tracking-[0.14em] text-black/40">
-                Workshop Tools
-              </div>
-            </div>
-          </div>
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 py-3 sm:py-4 flex items-center justify-between gap-3">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={PC_LOGO}
+            alt="Patterson Cheney — Cars and Trucks since 1915"
+            className="h-8 sm:h-10 w-auto object-contain shrink-0"
+          />
           <a
             href="tel:0395905000"
-            className="flex items-center gap-2 text-sm font-medium text-[#1a73c2] hover:text-[#0F4C81] transition-colors"
+            className="flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm font-medium text-[#1a73c2] hover:text-[#0F4C81] transition-colors shrink-0"
           >
             <Phone className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">03 9590 5000</span>
+            <span className="hidden xs:inline sm:inline">03 9590 5000</span>
           </a>
         </div>
       </header>
 
-      <main className="flex-1 flex items-center justify-center px-6 py-14">
+      <main className="flex-1 flex items-center justify-center px-4 sm:px-6 py-8 sm:py-14">
         <div className="w-full max-w-xl">
-          <div className="flex items-center gap-4 mb-8">
+          <div className="flex items-center gap-3 sm:gap-4 mb-6 sm:mb-8">
             <button
               onClick={() => router.replace("/")}
               aria-label="Back to recording"
-              className="w-11 h-11 shrink-0 rounded-full bg-white border border-black/[0.08] shadow-sm flex items-center justify-center text-[#0E1013] hover:bg-black/[0.03] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1a73c2]"
+              className="w-10 h-10 sm:w-11 sm:h-11 shrink-0 rounded-full bg-white border border-black/[0.08] shadow-sm flex items-center justify-center text-[#0E1013] hover:bg-black/[0.03] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1a73c2]"
             >
-              <ArrowLeft className="w-5 h-5" />
+              <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5" />
             </button>
             <div>
               <div className="flex items-center gap-2 mb-1">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#1a73c2]" />
-                <span className="text-[11px] font-mono uppercase tracking-[0.18em] text-black/40">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#1a73c2] shrink-0" />
+                <span className="text-[10px] sm:text-[11px] font-mono uppercase tracking-[0.14em] sm:tracking-[0.18em] text-black/40">
                   Review &amp; confirm
                 </span>
               </div>
-              <h1 className="text-3xl font-bold text-[#0E1013] tracking-tight">
+              <h1 className="text-2xl sm:text-3xl font-bold text-[#0E1013] tracking-tight">
                 Repair Order
               </h1>
             </div>
           </div>
 
-          <div className="bg-white rounded-[28px] p-8 shadow-[0_1px_2px_rgba(0,0,0,0.04),0_16px_40px_-16px_rgba(0,0,0,0.12)] border border-black/[0.06]">
-            <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="bg-white rounded-2xl sm:rounded-[28px] p-5 sm:p-8 shadow-[0_1px_2px_rgba(0,0,0,0.04),0_16px_40px_-16px_rgba(0,0,0,0.12)] border border-black/[0.06]">
+            <form onSubmit={handleSubmit} className="space-y-5 sm:space-y-6">
               <div>
-                <div className="flex items-baseline justify-between mb-2">
+                <div className="flex items-baseline justify-between mb-2 gap-2">
                   <label className="text-sm font-semibold text-[#0E1013]">
                     Work number
                   </label>
-                  <span className="text-[10px] font-mono text-[#1a73c2]/60">
+                  <span className="text-[10px] font-mono text-[#1a73c2]/60 shrink-0">
                     WORK_NO
                   </span>
                 </div>
@@ -238,16 +233,16 @@ export default function Form({ onSubmit }: RepairOrderForm2Props) {
                   onChange={(e) => setWorkNumber(e.target.value)}
                   placeholder="2024-1543"
                   required
-                  className="w-full px-5 py-3.5 bg-[#F4F6F8] border border-black/[0.08] rounded-xl text-[#0E1013] placeholder-black/30 focus:outline-none focus:ring-2 focus:ring-[#1a73c2] focus:border-transparent transition-all"
+                  className="w-full px-4 sm:px-5 py-3 sm:py-3.5 bg-[#F4F6F8] border border-black/[0.08] rounded-xl text-[#0E1013] placeholder-black/30 focus:outline-none focus:ring-2 focus:ring-[#1a73c2] focus:border-transparent transition-all"
                 />
               </div>
 
               <div>
-                <div className="flex items-baseline justify-between mb-2">
+                <div className="flex items-baseline justify-between mb-2 gap-2">
                   <label className="text-sm font-semibold text-[#0E1013]">
                     Vehicle information
                   </label>
-                  <span className="text-[10px] font-mono text-[#1a73c2]/60">
+                  <span className="text-[10px] font-mono text-[#1a73c2]/60 shrink-0">
                     VEHICLE
                   </span>
                 </div>
@@ -257,16 +252,16 @@ export default function Form({ onSubmit }: RepairOrderForm2Props) {
                   onChange={(e) => setVehicleInfo(e.target.value)}
                   placeholder="2019 Honda Civic"
                   required
-                  className="w-full px-5 py-3.5 bg-[#F4F6F8] border border-black/[0.08] rounded-xl text-[#0E1013] placeholder-black/30 focus:outline-none focus:ring-2 focus:ring-[#1a73c2] focus:border-transparent transition-all"
+                  className="w-full px-4 sm:px-5 py-3 sm:py-3.5 bg-[#F4F6F8] border border-black/[0.08] rounded-xl text-[#0E1013] placeholder-black/30 focus:outline-none focus:ring-2 focus:ring-[#1a73c2] focus:border-transparent transition-all"
                 />
               </div>
 
               <div>
-                <div className="flex items-baseline justify-between mb-2">
+                <div className="flex items-baseline justify-between mb-2 gap-2">
                   <label className="text-sm font-semibold text-[#0E1013]">
                     Problem description
                   </label>
-                  <span className="text-[10px] font-mono text-[#1a73c2]/60">
+                  <span className="text-[10px] font-mono text-[#1a73c2]/60 shrink-0">
                     ISSUE
                   </span>
                 </div>
@@ -276,13 +271,13 @@ export default function Form({ onSubmit }: RepairOrderForm2Props) {
                   placeholder="Customer reports unusual grinding noise when braking and steering wheel vibration at high speeds"
                   required
                   rows={4}
-                  className="w-full px-5 py-3.5 bg-[#F4F6F8] border border-black/[0.08] rounded-xl text-[#0E1013] placeholder-black/30 focus:outline-none focus:ring-2 focus:ring-[#1a73c2] focus:border-transparent transition-all resize-none"
+                  className="w-full px-4 sm:px-5 py-3 sm:py-3.5 bg-[#F4F6F8] border border-black/[0.08] rounded-xl text-[#0E1013] placeholder-black/30 focus:outline-none focus:ring-2 focus:ring-[#1a73c2] focus:border-transparent transition-all resize-none"
                 />
               </div>
 
               <button
                 type="submit"
-                className="w-full flex items-center justify-center gap-2 py-4 bg-[#1a73c2] text-white text-[15px] font-semibold rounded-2xl hover:bg-[#155a99] active:scale-[0.99] transition-all duration-200 shadow-lg shadow-[#1a73c2]/20"
+                className="w-full flex items-center justify-center gap-2 py-3.5 sm:py-4 bg-[#1a73c2] text-white text-sm sm:text-[15px] font-semibold rounded-2xl hover:bg-[#155a99] active:scale-[0.99] transition-all duration-200 shadow-lg shadow-[#1a73c2]/20"
               >
                 Submit repair order
                 <ArrowRight className="w-4 h-4" />
@@ -292,8 +287,8 @@ export default function Form({ onSubmit }: RepairOrderForm2Props) {
         </div>
       </main>
 
-      <footer className="border-t border-black/[0.06] py-5">
-        <div className="max-w-4xl mx-auto px-6 text-center text-[11px] font-mono uppercase tracking-[0.14em] text-black/30">
+      <footer className="border-t border-black/[0.06] py-4 sm:py-5">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 text-center text-[10px] sm:text-[11px] font-mono uppercase tracking-[0.1em] sm:tracking-[0.14em] text-black/30">
           Patterson Cheney Group — Internal Workshop Tool
         </div>
       </footer>
