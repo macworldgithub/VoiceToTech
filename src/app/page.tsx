@@ -259,11 +259,10 @@
 
 // export default App;
 
-
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
-import { Mic, Square } from "lucide-react";
+import { Mic, Square, Phone } from "lucide-react";
 import Soundwave from "../../components/Soundwave";
 import { useRouter } from "next/navigation";
 import Loader from "../../components/Loader";
@@ -433,97 +432,125 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#0a1830] via-[#0f2547] to-[#050d1c] flex items-center justify-center p-6">
-      <div className="w-full max-w-4xl">
-        <div className="text-center mb-12">
-          <div className="inline-flex items-center gap-2 mb-4">
-            <div className="h-1 w-10 bg-[#c8102e] rounded-full" />
-            <span className="text-xs font-semibold tracking-[0.25em] text-white/60 uppercase">
-              Patterson Cheney
-            </span>
-            <div className="h-1 w-10 bg-[#c8102e] rounded-full" />
+    <div className="min-h-screen bg-[#eef1f4] flex flex-col">
+      {/* Top bar — mirrors pattersoncheney.com.au header */}
+      <header className="bg-white border-b border-black/10">
+        <div className="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            {/* Two-tone circular badge echoing the PC logo mark */}
+            <div className="relative w-11 h-11 rounded-full overflow-hidden border border-black/10 shrink-0">
+              <div className="absolute inset-0 bg-[#1a73c2]" style={{ clipPath: "polygon(0 0, 100% 0, 100% 55%, 0 55%)" }} />
+              <div className="absolute inset-0 bg-[#f2b90c]" style={{ clipPath: "polygon(0 55%, 100% 55%, 100% 100%, 0 100%)" }} />
+            </div>
+            <div className="leading-tight">
+              <div className="text-xl font-bold text-[#151515] tracking-tight">
+                Patterson Cheney
+              </div>
+              <div className="text-[11px] text-black/50 italic -mt-0.5">
+                Cars and Trucks since 1915
+              </div>
+            </div>
           </div>
-          <h1 className="text-5xl font-bold text-white mb-4">
-            Voice to Tech
-          </h1>
-          <p className="text-xl text-white/70">
-            Workshop Repair Order Assistant
-          </p>
-        </div>
-
-        <div className="space-y-4 mb-16">
-          <div className="bg-white/[0.06] backdrop-blur-sm border border-white/10 rounded-full px-6 py-4 text-white/60">
-            What is your work number?
-          </div>
-          <div className="bg-white/[0.06] backdrop-blur-sm border border-white/10 rounded-full px-6 py-4 text-white/60">
-            What is your Vehicle Information?
-          </div>
-          <div className="bg-white/[0.06] backdrop-blur-sm border border-white/10 rounded-full px-6 py-4 text-white/60">
-            What is your problem?
+          <div className="hidden sm:flex items-center gap-2 text-[#1a73c2] font-semibold">
+            <Phone className="w-4 h-4" />
+            <span>03 9590 5000</span>
           </div>
         </div>
+      </header>
 
-        {loader && <Loader />}
-
-        <div className="flex flex-col items-center">
-          <div className="relative w-full h-32 mb-8">
-            <Soundwave isActive={isRecording} />
+      <main className="flex-1 flex items-center justify-center p-6">
+        <div className="w-full max-w-4xl">
+          <div className="text-center mb-10">
+            <h1 className="text-4xl sm:text-5xl font-bold text-[#151515] mb-3">
+              Voice to Tech
+            </h1>
+            <p className="text-lg text-black/60">
+              Workshop Repair Order Assistant
+            </p>
           </div>
 
-          {isRecording && (
-            <div className="text-3xl font-mono text-[#e4344f] mb-6">
-              {formatTime(recordingTime)}
+          {/* Dark panel echoing the black search bar on pattersoncheney.com.au */}
+          <div className="bg-[#111111] rounded-2xl p-6 space-y-3 mb-12">
+            <div className="bg-white/[0.06] border border-white/10 rounded-full px-6 py-4 text-white/60">
+              What is your work number?
             </div>
-          )}
-
-          <button
-            onClick={toggleRecording}
-            className={`relative group transition-all duration-300 ${
-              isRecording ? "scale-110" : "hover:scale-105"
-            }`}
-          >
-            <div
-              className={`absolute inset-0 rounded-full blur-2xl transition-all duration-300 ${
-                isRecording
-                  ? "bg-[#c8102e]/50 animate-pulse"
-                  : "bg-[#c8102e]/25 group-hover:bg-[#c8102e]/35"
-              }`}
-            />
-            <div
-              className={`relative rounded-full p-8 transition-all duration-300 ${
-                isRecording
-                  ? "bg-gradient-to-br from-[#c8102e] to-[#8f0b21]"
-                  : "bg-gradient-to-br from-white/[0.08] to-white/[0.04] group-hover:from-[#c8102e]/20 group-hover:to-[#c8102e]/10"
-              } backdrop-blur-sm border-2 ${
-                isRecording ? "border-[#e4344f]" : "border-white/20"
-              }`}
-            >
-              {isRecording ? (
-                <Square className="w-12 h-12 text-white fill-white" />
-              ) : (
-                <Mic className="w-12 h-12 text-white" />
-              )}
+            <div className="bg-white/[0.06] border border-white/10 rounded-full px-6 py-4 text-white/60">
+              What is your Vehicle Information?
             </div>
-          </button>
-
-          {/* Preview shows only after stop */}
-          {audioURL && !isRecording && (
-            <div className="mt-8 w-full max-w-md text-center">
-              <p className="text-white/60 mb-2">Preview your recording:</p>
-              <audio controls playsInline src={audioURL}></audio>
+            <div className="bg-white/[0.06] border border-white/10 rounded-full px-6 py-4 text-white/60">
+              What is your problem?
             </div>
-          )}
+          </div>
 
-          {showSubmit && !isRecording && (
+          {loader && <Loader />}
+
+          <div className="flex flex-col items-center">
+            <div className="relative w-full h-32 mb-8">
+              <Soundwave isActive={isRecording} />
+            </div>
+
+            {isRecording && (
+              <div className="text-3xl font-mono text-[#1a73c2] mb-6">
+                {formatTime(recordingTime)}
+              </div>
+            )}
+
             <button
-              onClick={submitRecording}
-              className="mt-8 px-12 py-4 bg-[#c8102e] text-white text-xl font-semibold rounded-full hover:bg-[#a80d26] transition-all duration-300 shadow-lg shadow-[#c8102e]/30 hover:shadow-xl hover:scale-105"
+              onClick={toggleRecording}
+              className={`relative group transition-all duration-300 ${
+                isRecording ? "scale-110" : "hover:scale-105"
+              }`}
             >
-              Submit
+              <div
+                className={`absolute inset-0 rounded-full blur-2xl transition-all duration-300 ${
+                  isRecording
+                    ? "bg-[#c62828]/40 animate-pulse"
+                    : "bg-[#1a73c2]/30 group-hover:bg-[#1a73c2]/40"
+                }`}
+              />
+              <div
+                className={`relative rounded-full p-8 transition-all duration-300 ${
+                  isRecording
+                    ? "bg-[#c62828]"
+                    : "bg-[#1a73c2] group-hover:bg-[#155a99]"
+                } shadow-lg border-4 ${
+                  isRecording ? "border-[#e57373]" : "border-white"
+                }`}
+              >
+                {isRecording ? (
+                  <Square className="w-12 h-12 text-white fill-white" />
+                ) : (
+                  <Mic className="w-12 h-12 text-white" />
+                )}
+              </div>
             </button>
-          )}
+
+            {/* Preview shows only after stop */}
+            {audioURL && !isRecording && (
+              <div className="mt-8 w-full max-w-md text-center">
+                <p className="text-black/60 mb-2">Preview your recording:</p>
+                <audio controls playsInline src={audioURL}></audio>
+              </div>
+            )}
+
+            {showSubmit && !isRecording && (
+              <button
+                onClick={submitRecording}
+                className="mt-8 px-12 py-4 bg-[#1a73c2] text-white text-lg font-bold uppercase tracking-wide rounded-md hover:bg-[#155a99] transition-all duration-300 shadow-lg hover:shadow-xl"
+              >
+                Submit
+              </button>
+            )}
+          </div>
         </div>
-      </div>
+      </main>
+
+      {/* Bottom bar echoing the site's black footer */}
+      <footer className="bg-[#111111] py-5">
+        <div className="max-w-5xl mx-auto px-6 text-center text-white/40 text-xs">
+          Patterson Cheney Group — Internal Workshop Tool
+        </div>
+      </footer>
     </div>
   );
 }
