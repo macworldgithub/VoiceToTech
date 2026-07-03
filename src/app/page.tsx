@@ -451,7 +451,7 @@ function App() {
             className="h-8 sm:h-10 w-auto object-contain shrink-0"
           />
           <a
-            href="tel:0395905000"
+            href="tel:+61395905000"
             className="flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm font-medium text-[#1a73c2] hover:text-[#0F4C81] transition-colors shrink-0"
           >
             <Phone className="w-3.5 h-3.5" />
