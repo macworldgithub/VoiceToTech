@@ -918,8 +918,6 @@
 // }
 
 // export default App;
-
-
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
@@ -932,6 +930,8 @@ import {
   Video,
   X,
   ImagePlus,
+  Images,
+  FolderOpen,
 } from "lucide-react";
 import Soundwave from "../../components/Soundwave";
 import { useRouter } from "next/navigation";
@@ -975,8 +975,15 @@ function App() {
   const timerRef = useRef<number | null>(null);
   const router = useRouter();
 
-  const photoInputRef = useRef<HTMLInputElement>(null);
-  const videoInputRef = useRef<HTMLInputElement>(null);
+  // Separate refs for camera-capture vs gallery-picker inputs. Some mobile
+  // browsers (notably several Android/Chrome versions) treat the `capture`
+  // attribute as a hard instruction to launch the camera directly, with no
+  // way to back out to the photo/video library from that picker. Keeping
+  // two distinct inputs guarantees a gallery option is always available.
+  const cameraPhotoInputRef = useRef<HTMLInputElement>(null);
+  const galleryPhotoInputRef = useRef<HTMLInputElement>(null);
+  const cameraVideoInputRef = useRef<HTMLInputElement>(null);
+  const galleryVideoInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     return () => {
@@ -1391,41 +1398,77 @@ function App() {
                     )}
                   </div>
 
-                  <div className="flex gap-2.5 sm:gap-3">
+                  <div className="grid grid-cols-2 gap-2.5 sm:gap-3">
                     <button
                       type="button"
-                      onClick={() => photoInputRef.current?.click()}
-                      className="flex-1 flex items-center justify-center gap-2 py-2.5 sm:py-3 rounded-xl bg-white/[0.06] border border-white/[0.1] text-white/70 text-xs sm:text-sm font-medium hover:bg-white/[0.1] hover:text-white transition-colors"
+                      onClick={() => cameraPhotoInputRef.current?.click()}
+                      className="flex items-center justify-center gap-2 py-2.5 sm:py-3 rounded-xl bg-white/[0.06] border border-white/[0.1] text-white/70 text-xs sm:text-sm font-medium hover:bg-white/[0.1] hover:text-white transition-colors"
                     >
                       <Camera className="w-4 h-4" />
-                      Photo
+                      Take photo
                     </button>
                     <button
                       type="button"
-                      onClick={() => videoInputRef.current?.click()}
-                      className="flex-1 flex items-center justify-center gap-2 py-2.5 sm:py-3 rounded-xl bg-white/[0.06] border border-white/[0.1] text-white/70 text-xs sm:text-sm font-medium hover:bg-white/[0.1] hover:text-white transition-colors"
+                      onClick={() => galleryPhotoInputRef.current?.click()}
+                      className="flex items-center justify-center gap-2 py-2.5 sm:py-3 rounded-xl bg-white/[0.06] border border-white/[0.1] text-white/70 text-xs sm:text-sm font-medium hover:bg-white/[0.1] hover:text-white transition-colors"
+                    >
+                      <Images className="w-4 h-4" />
+                      From gallery
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => cameraVideoInputRef.current?.click()}
+                      className="flex items-center justify-center gap-2 py-2.5 sm:py-3 rounded-xl bg-white/[0.06] border border-white/[0.1] text-white/70 text-xs sm:text-sm font-medium hover:bg-white/[0.1] hover:text-white transition-colors"
                     >
                       <Video className="w-4 h-4" />
-                      Video
+                      Record video
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => galleryVideoInputRef.current?.click()}
+                      className="flex items-center justify-center gap-2 py-2.5 sm:py-3 rounded-xl bg-white/[0.06] border border-white/[0.1] text-white/70 text-xs sm:text-sm font-medium hover:bg-white/[0.1] hover:text-white transition-colors"
+                    >
+                      <FolderOpen className="w-4 h-4" />
+                      Video from gallery
                     </button>
                   </div>
 
-                  {/* Hidden native inputs — capture opens the device camera on mobile.
-                      Broad accept lists include iPhone HEIC/HEIF photos and MOV videos. */}
+                  {/* Hidden native inputs. Camera-capture inputs use `capture`
+                      to open the device camera directly; gallery inputs omit
+                      it so the OS file/photo picker (library) opens instead —
+                      some Android browsers won't offer a library option if
+                      `capture` is present, so we keep them fully separate.
+                      Broad accept lists include iPhone HEIC/HEIF photos and
+                      MOV/HEVC videos. */}
                   <input
-                    ref={photoInputRef}
+                    ref={cameraPhotoInputRef}
                     type="file"
                     accept={PHOTO_ACCEPT}
                     capture="environment"
+                    className="hidden"
+                    onChange={handleAddPhotos}
+                  />
+                  <input
+                    ref={galleryPhotoInputRef}
+                    type="file"
+                    accept={PHOTO_ACCEPT}
                     multiple
                     className="hidden"
                     onChange={handleAddPhotos}
                   />
                   <input
-                    ref={videoInputRef}
+                    ref={cameraVideoInputRef}
                     type="file"
                     accept={VIDEO_ACCEPT}
                     capture="environment"
+                    className="hidden"
+                    onChange={handleAddVideo}
+                  />
+                  <input
+                    ref={galleryVideoInputRef}
+                    type="file"
+                    accept={VIDEO_ACCEPT}
+                    multiple
                     className="hidden"
                     onChange={handleAddVideo}
                   />
@@ -1478,9 +1521,9 @@ function App() {
                       ))}
                       <button
                         type="button"
-                        onClick={() => photoInputRef.current?.click()}
+                        onClick={() => galleryPhotoInputRef.current?.click()}
                         className="aspect-square rounded-lg border border-dashed border-white/20 flex items-center justify-center text-white/30 hover:text-white/60 hover:border-white/40 transition-colors"
-                        aria-label="Add more photos"
+                        aria-label="Add more from gallery"
                       >
                         <ImagePlus className="w-5 h-5" />
                       </button>
